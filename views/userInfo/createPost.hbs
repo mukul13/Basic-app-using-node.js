@@ -1,0 +1,8 @@
+<form action="createPost" method="post">
+  Title:<br>
+  <input type="text" name="title"><br>
+  Post:<br>
+  <input type="text" name="postContent">
+  <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+  <button type="submit">Create Post</button>
+</form>

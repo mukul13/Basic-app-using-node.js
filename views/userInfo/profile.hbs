@@ -1,0 +1,81 @@
+
+<h1>hello {{email}}</h1>
+<input type="hidden" class="csrf" name="_csrf" value="{{ csrfToken }}">
+{{# each posts }}
+  
+<div class = "row">
+  <div class="socialPosts">
+    <div class="col-sm-6 col-md-4">
+      <div class="thumbnail">
+       <!-- <img src="..." alt="..."> -->
+        <div class="caption">
+          <h3>{{this.title}}</h3>
+          <p>{{this.postContent}}</p>
+          <p><a href="#" class="btn btn-success like {{ this.id }}" id="{{this.isLiked}}" role="button"><i class="fa fa-heart-o" aria-hidden="true"></i>{{this.likes}} Like</a> <a href="#" class="btn btn-success" name = "like" role="button"><i class="fa fa-share" aria-hidden="true"></i>Share</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{{/each}}
+
+
+<script   src="http://code.jquery.com/jquery-1.12.4.min.js"   integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ="   crossorigin="anonymous"></script>
+
+<script type="text/javascript">
+
+var CSRF_HEADER = 'X-CSRF-Token';
+
+var setCSRFToken = function (securityToken) {
+  jQuery.ajaxPrefilter(function (options, _, xhr) {
+    if (!xhr.crossDomain) {
+      xhr.setRequestHeader(CSRF_HEADER, securityToken);
+    }
+  });
+};
+
+$(".like").click(function(event){
+  event.preventDefault();
+  // Holds the product ID of the clicked element
+  var noOfLikes = $(this).html().replace('<i class="fa fa-heart-o" aria-hidden="true"></i>', '').replace(' Like','');
+  console.log(this.className);
+  var isLiked = document.getElementsByClassName(this.className)[0].id;
+  //console.log(isLiked);
+  //isLiked = true;
+  var _csrf = $('.csrf').attr('value');
+  var data = {};
+  setCSRFToken(_csrf);
+  data.noOfLikes = noOfLikes;
+  data.postId = $(this).attr('class').replace('btn btn-success like ','');
+  if(isLiked=='true')
+    {
+      $(this).html('<i class="fa fa-heart-o" aria-hidden="true"></i>'+String(Number(noOfLikes) - 1)+' Like');
+      console.log(isLiked);
+      document.getElementsByClassName(this.className)[0].id = "false";
+     // $(this).attr('val':'false'); 
+    }
+  else
+    {
+      $(this).html('<i class="fa fa-heart-o" aria-hidden="true"></i>'+String(Number(noOfLikes) + 1)+' Like');
+      console.log(isLiked);
+      document.getElementsByClassName(this.className)[0].id = "true";
+     // $(this).val('val','true');
+    }
+  //data._csrf = _csrf;
+ // JSON.stringify(data);
+ // console.log(data);
+              $.ajax({
+                    type: 'POST',
+                    url: 'http://localhost:3000/userInfo/updateLikes',
+                    data: data,
+                    dataType: 'application/json',
+                    success: function(data) {
+                        console.log('success');
+                        console.log(data);
+                    }
+                });
+});
+
+
+</script>
+
